@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5c518">
+<title>RollerKey Ultra Beta 2</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#0b0a06; --pane:#14110a; --pane2:#1c1709; --lin:#3a2f12;
+  --gold:#f5c518; --gold2:#ffe680; --txt:#efe6c8; --dim:#8a7c4e;
+  --rot:#ff5a5a; --gruen:#7ddc6a; --blau:#6ab8ff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:14px 12px 40px;background:var(--bg);color:var(--txt);
+  font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+body.cockpitAn{overflow:hidden}
+h1{font-size:17px;letter-spacing:.16em;margin:0 0 2px;color:var(--gold)}
+h1 small{display:block;font-size:9px;letter-spacing:.3em;color:var(--dim);margin-top:4px}
+h2{font-size:11px;letter-spacing:.24em;color:var(--gold);margin:0 0 10px;
+  padding-bottom:6px;border-bottom:1px solid var(--lin)}
+section{background:var(--pane);border:1px solid var(--lin);border-radius:12px;
+  padding:14px;margin:12px 0}
+section.heiss{background:linear-gradient(180deg,#1e1808,#14110a);border-color:#6b5518}
+#status{font-size:12px;min-height:34px;padding:9px 11px;border-radius:9px;
+  background:var(--pane2);border:1px solid var(--lin);color:var(--dim);margin-top:10px}
+#status.ok{color:var(--gruen);border-color:#2f6b22}
+#status.err{color:var(--rot);border-color:#6b2222}
+#status.warn{color:var(--gold);border-color:#6b5518}
+.leuchten{display:flex;gap:8px;margin:10px 0 4px}
+.leuchten i{flex:1;height:9px;border-radius:6px;background:#241e0d;border:1px solid var(--lin);
+  transition:.2s}
+.leuchten i.rot{background:var(--rot);box-shadow:0 0 10px var(--rot)}
+.leuchten i.gelb{background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.leuchten i.gruen{background:var(--gruen);box-shadow:0 0 10px var(--gruen)}
+.leuchten i.blau{background:var(--blau);box-shadow:0 0 10px var(--blau)}
+.marke{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.marke button{font-size:10px;letter-spacing:.1em;padding:8px 0;border-radius:8px;
+  background:var(--pane2);border:1px solid var(--lin);color:var(--dim)}
+.marke button.on{background:var(--gold);border-color:var(--gold);color:#161204;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+button{font:inherit;font-size:12px;letter-spacing:.08em;padding:11px 8px;border-radius:9px;
+  background:var(--pane2);border:1px solid var(--lin);color:var(--txt);cursor:pointer}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.4}
+button.weit{grid-column:1/-1}
+button.gross{padding:15px;font-size:14px;font-weight:700;letter-spacing:.14em;
+  background:linear-gradient(180deg,var(--gold2),var(--gold));color:#161204;border-color:var(--gold)}
+button.rot{background:#2a1010;border-color:#6b2222;color:#ff9a9a}
+button.gruen{background:#10230f;border-color:#2f6b22;color:var(--gruen)}
+button.klein{font-size:10px;padding:8px 6px}
+.reihe{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:5px 0;
+  border-bottom:1px dotted #241e0d}
+.reihe:last-child{border-bottom:0}
+.reihe b{color:var(--gold);font-weight:600;text-align:right}
+.karte{position:relative;border-radius:12px;padding:14px;background:
+  linear-gradient(135deg,#241d08,#171205 60%,#0f0c04);
+  border:1px solid #6b5518;overflow:hidden}
+.karte::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;
+  border-radius:50%;background:radial-gradient(circle,#f5c51822,transparent 70%)}
+.karte .typ{font-size:9px;letter-spacing:.24em;color:var(--gold2)}
+.karte .nr{font-size:15px;letter-spacing:.14em;margin:10px 0;color:#fff8dc}
+.karte .fuss{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+.karte .lab{font-size:8px;letter-spacing:.2em;color:var(--dim)}
+.karte .val{font-size:11px;color:#f3e6b0}
+.karte .rechts{text-align:right}
+#cLimit{font-size:14px;color:var(--gold);font-weight:700}
+#cockpit{display:none;position:fixed;inset:0;z-index:60;background:var(--bg);
+  overflow-y:auto;padding:14px 12px 96px}
+#cockpit.an{display:block}
+#cockpit .kopf{display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--lin);padding-bottom:8px;margin-bottom:14px}
+#cockpit .kopf span{font-size:11px;letter-spacing:.24em;color:var(--gold)}
+#cockpit .kopf b{font-size:10px;color:var(--dim);letter-spacing:.16em}
+.tempo{text-align:center;font-size:46px;font-weight:700;color:var(--gold);
+  line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 0 18px #f5c51855}
+.tempo small{font-size:12px;letter-spacing:.2em;display:block;color:var(--dim);margin-top:4px}
+.stufen{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.stufen button.on{background:var(--gold);color:#161204;border-color:var(--gold);font-weight:700}
+input[type=range]{width:100%;margin:10px 0 0;accent-color:var(--gold)}
+input[type=text],input[type=number]{width:100%;padding:10px;border-radius:9px;
+  background:#0d0b05;border:1px solid var(--lin);color:var(--txt);font:inherit;font-size:12px}
+.zeit{font-size:30px;text-align:center;color:var(--dim);font-variant-numeric:tabular-nums;
+  letter-spacing:.1em;margin-top:6px}
+.zeit.laeuft{color:var(--gold);text-shadow:0 0 14px #f5c51844}
+#bZurueck{position:fixed;right:14px;bottom:14px;z-index:70;padding:11px 16px;font-size:11px;
+  border-radius:22px;background:var(--pane2);border:1px solid var(--gold);color:var(--gold)}
+#log{height:170px;overflow:auto;background:#080702;border:1px solid var(--lin);
+  border-radius:9px;padding:9px;font-size:10px;line-height:1.55;color:#9c8f5e}
+#log div{margin-bottom:3px;word-break:break-word}
+#log .g{color:var(--gruen)} #log .e{color:var(--rot)} #log .y{color:var(--gold)}
+.hinweis{font-size:10.5px;color:var(--dim);line-height:1.6;margin-top:10px}
+.hinweis b{color:var(--gold2)}
+details{margin-top:10px;border-top:1px dotted #241e0d;padding-top:9px}
+summary{font-size:10px;letter-spacing:.18em;color:var(--dim);cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+ ";color:var(--gold)}
+details[open] summary::before{content:"− "}
+video{width:100%;border-radius:9px;background:#000;display:none;margin-top:9px}
+video.an{display:block}
+</style>
+</head>
+<body>
+
+<h1>ROLLERKEY<small>ULTRA BETA 2</small></h1>
+<div id="status">startet …</div>
+<div class="leuchten"><i id="l1"></i><i id="l2"></i><i id="l3"></i><i id="l4"></i></div>
+
+<section class="heiss">
+  <h2>ROLLER</h2>
+  <div class="marke">
+    <button data-b="lime" class="on">LIME</button>
+    <button data-b="voi">VOI</button>
+    <button data-b="bolt">BOLT</button>
+    <button data-b="dott">DOTT</button>
+  </div>
+  <div class="reihe"><span>Gerät</span><b id="uGer">–</b></div>
+  <div class="reihe"><span>Marke / max</span><b id="uMarke">–</b></div>
+  <div class="reihe"><span>Akku</span><b id="uAkk">–</b></div>
+  <div class="grid">
+    <button id="bConn">VERBINDEN</button>
+    <button id="bTren">TRENNEN</button>
+    <button class="weit gross" id="bUnlock">ENTSPERREN</button>
+    <button class="weit" id="bLock">SPERREN</button>
+    <button id="bScan">QR SCANNEN</button>
+    <button id="bCock">COCKPIT</button>
+    <button id="bBeep" class="klein">PIEPSEN</button>
+    <button id="bLicht" class="klein">LICHT</button>
+    <button class="weit" id="bWeg4">LENKERNUMMER</button>
+  </div>
+  <video id="cam" playsinline muted></video>
+  <div class="hinweis">Erst <b>VERBINDEN</b>, dann <b>ENTSPERREN</b>. Fragt iOS nach einem Code:
+  Nummer vom Display, sonst 000000.</div>
+</section>
+
+<section>
+  <h2>KARTE</h2>
+  <div class="reihe"><span>Wert je Karte</span><b id="uWert">5,00 €</b></div>
+  <div class="grid">
+    <input type="number" id="iWert" min="1" max="100" step="1" value="5" inputmode="numeric">
+    <button id="bWert">WERT SETZEN</button>
+  </div>
+  <div class="grid">
+    <button data-g="200" class="klein">2 €</button>
+    <button data-g="500" class="klein">5 €</button>
+    <button data-g="1000" class="klein">10 €</button>
+    <button data-g="2000" class="klein">20 €</button>
+  </div>
+  <div class="karte" style="margin-top:10px">
+    <div class="typ" id="cTyp">LEER</div>
+    <div class="nr" id="cNum">•••• •••• •••• ••••</div>
+    <div class="fuss">
+      <div><div class="lab">INHABER</div><div class="val" id="cHal">–</div></div>
+      <div><div class="lab">GÜLTIG</div><div class="val" id="cExp">--/--</div></div>
+      <div><div class="lab">CVC</div><div class="val" id="cCvv">---</div></div>
+      <div class="rechts"><div class="lab">REST</div><div class="val" id="cLimit">–</div></div>
+    </div>
+  </div>
+  <div class="reihe" style="margin-top:8px"><span>Adresse</span><b id="cAdr">–</b></div>
+  <div class="reihe"><span>Kennung</span><b id="cZust">–</b></div>
+  <div id="statusKarte" class="hinweis"></div>
+  <div class="grid">
+    <button id="bNeuKarte">NEUE KARTE</button>
+    <button id="bPruefKarte">PRÜFEN</button>
+    <button id="bKopieren" class="weit">ALLES KOPIEREN</button>
+  </div>
+  <div class="hinweis">Wert vorher festlegen, dann <b>NEUE KARTE</b>. Name, Adresse, Nummer und
+  CVC werden bei jedem Wurf frisch gewürfelt.</div>
+</section>
+
+<section>
+  <h2>KONTO</h2>
+  <div class="reihe"><span>Mail</span><b id="uMail">–</b></div>
+  <div class="reihe"><span>Sitzung</span><b id="uSitz">–</b></div>
+  <div class="reihe"><span>Postfach</span><b id="uPost">–</b></div>
+  <div class="grid">
+    <button class="weit gross" id="bAuto">AUTOMATIK</button>
+    <button id="bWeg2">NUR KARTE</button>
+    <button id="bWeg3">NUR BLUETOOTH</button>
+    <button id="bHinterlegen" class="weit">KARTE HINTERLEGEN</button>
+  </div>
+  <div class="hinweis">Immer Wegwerf-Postfach und Fake-Karte. Nie dein echtes Konto.</div>
+</section>
+
+<details>
+  <summary>ERWEITERT</summary>
+  <div class="reihe"><span>Grenze in Euro</span><b id="uGrenze2">5,00 €</b></div>
+  <div class="grid">
+    <button id="bNeu" class="weit">SOFORT NEUES KONTO</button>
+    <button id="bWeg1">AUTOMATIK</button>
+    <button id="bWeg2b">NUR KARTE</button>
+    <button id="bWeg3b">NUR BLUETOOTH</button>
+    <button id="bWeg4b">LENKERNUMMER</button>
+    <button id="bPruef">SELBSTPRÜFUNG</button>
+    <button id="bNetz">NETZTEST</button>
+    <button id="bDiag">DIAGNOSE</button>
+    <button id="bLeer" class="weit">PROTOKOLL LEEREN</button>
+  </div>
+</details>
+
+<section>
+  <h2>PROTOKOLL</h2>
+  <div id="log"></div>
+</section>
+
+<div id="cockpit">
+  <div class="kopf"><span>COCKPIT</span><b id="cMarke">–</b></div>
+  <div class="tempo"><span id="cIst">0</span><small id="cWahl">gewählt 20 km/h</small></div>
+  <div class="stufen">
+    <button data-t="20">20</button>
+    <button data-t="25">25</button>
+    <button data-t="max">MAX</button>
+  </div>
+  <input type="range" id="iTempo" min="15" max="27" step="1" value="20">
+  <div class="reihe" id="reiheStufe" style="display:none"><span>Fahrstufe</span><b id="cStufe">–</b></div>
+  <div class="hinweis" id="cText"></div>
+  <h2 style="margin-top:16px">FAHRT</h2>
+  <div class="zeit" id="uZeit">00:00</div>
+  <div class="reihe"><span>Verbraucht</span><b id="uUsed">0,00 €</b></div>
+  <div class="reihe"><span>Grenze</span><b id="uGrenze">5,00 €</b></div>
+  <div class="reihe"><span>Status</span><b id="uFahrt">steht</b></div>
+  <div class="grid">
+    <button id="bStart">FAHRT START</button>
+    <button id="bStop">FAHRT STOPP</button>
+  </div>
+  <button id="bZurueck">ZURÜCK</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
