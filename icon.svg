@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0b0a06"/>
+  <rect x="26" y="26" width="460" height="460" rx="78" fill="none" stroke="#3a2f12" stroke-width="7"/>
+  <circle cx="256" cy="150" r="27" fill="#f5c518"/>
+  <path d="M256 196v130M256 326l-62 96M256 326l62 96M256 250h84" fill="none"
+        stroke="#f5c518" stroke-width="23" stroke-linecap="round"/>
+  <text x="256" y="474" text-anchor="middle" font-family="monospace" font-size="54"
+        letter-spacing="7" fill="#ffe680">RK</text>
+</svg>
